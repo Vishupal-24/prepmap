@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: prepmap-demo
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --timeout 120
+    envVars:
+      - key: DEMO_MODE
+        value: "1"
+      - key: LLM_PROVIDER
+        value: gemini
+      - key: GEMINI_MODEL
+        value: gemma-3-27b-it
+      - key: PREPMAP_DB
+        value: /tmp/prepmap.db
+      - key: PYTHON_VERSION
+        value: 3.12.7
+      - key: GEMINI_API_KEY
+        sync: false
