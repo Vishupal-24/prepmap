@@ -9,7 +9,11 @@
   <div><strong>{{ (s.baseline_recall * 100)|round|int if s.baseline_recall is not none else '–' }}{{ '%' if s.baseline_recall is not none }}</strong><span>covered by a generic plan</span></div>
   <div><strong>{{ s.n }}</strong><span>stories tested (plan size {{ s.plan_size }})</span></div>
 </div>
+{% if demo %}
+<p class="note">These numbers come from the made-up sample stories in this demo, so they only show how the test works. Real results come from real stories run locally.</p>
+{% else %}
 <p class="note">Small numbers. Treat this as a pilot, not proof.</p>
+{% endif %}
 <table class="facts">
   <tr><th>Story</th><th>Company</th><th>Topics</th><th>Plan</th><th>Generic</th></tr>
   {% for r in rows %}
