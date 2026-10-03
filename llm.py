@@ -16,7 +16,7 @@ OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "gemma3:4b")
 GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemma-4-26b-a4b-it")
 # if the newer model is not available on this key, fall back to Gemma 3
 GEMINI_FALLBACK = os.environ.get("GEMINI_FALLBACK", "gemma-3-27b-it")
-TIMEOUT = 180
+TIMEOUT = 150
 
 _mock_reply = None  # tests set this
 
@@ -74,7 +74,10 @@ def _gemini(prompt):
         _active_model = GEMINI_FALLBACK
         r = _gemini_call(_active_model, prompt)
     r.raise_for_status()
-    parts = r.json()["candidates"][0]["content"]["parts"]
+    body = r.json()
+    # shows up in the Render logs, handy for spotting slow calls
+    print(f"[gemma] {_active_model} {r.elapsed.total_seconds():.1f}s usage={body.get('usageMetadata')}", flush=True)
+    parts = body["candidates"][0]["content"]["parts"]
     # thinking models can return a thought part first; keep the visible text
     return "".join(p.get("text", "") for p in parts if not p.get("thought"))
 
