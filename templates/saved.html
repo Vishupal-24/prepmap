@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block body %}
+{% if demo_only %}
+<h1>Demo mode</h1>
+<p>This public demo doesn't store stories. Real stories are saved only on a local machine running local Gemma.</p>
+{% elif deleted is defined %}
+<h1>{{ 'Deleted' if deleted else 'Nothing to delete' }}</h1>
+<p>{{ 'Your story and everything taken from it is gone.' if deleted else 'That link was already used or is wrong.' }}</p>
+{% else %}
+<h1>Thank you</h1>
+<p>Your story is now part of the <a href="{{ url_for('company', name=company) }}">{{ company }} playbook</a>.</p>
+<p class="note">Keep this link to delete it any time: <code>{{ url_for('delete', token=token, _external=True) }}</code></p>
+{% endif %}
+<p><a href="{{ url_for('home') }}">Back home</a></p>
+{% endblock %}

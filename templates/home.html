@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block body %}
+<section class="hero">
+  <h1>Who has already cracked this internship?</h1>
+  <p class="muted">Ask in plain words. You get seniors who went through it, why they match, and a prep plan built from what they actually said.</p>
+  <form method="post" action="{{ url_for('ask') }}" class="ask">
+    <input name="q" placeholder="e.g. Google SWE intern OA next week, weak at graphs and DP" required autofocus>
+    <button>Find people</button>
+  </form>
+</section>
+
+<section>
+  <h2>Playbooks</h2>
+  {% if companies %}
+  <ul class="cards">
+    {% for c in companies %}
+    <li><a href="{{ url_for('company', name=c.company) }}"><strong>{{ c.company }}</strong><span>{{ c.n }} {{ 'story' if c.n == 1 else 'stories' }}</span></a></li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="muted">No stories yet. <a href="{{ url_for('share') }}">Add the first one.</a></p>
+  {% endif %}
+</section>
+{% endblock %}

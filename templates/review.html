@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Check before saving</h1>
+<p class="muted">Untick anything that's wrong. Nothing is saved until you press Save.</p>
+<form method="post" action="{{ url_for('save') }}">
+  <input type="hidden" name="text" value="{{ text }}">
+  <div class="grid">
+    <label>Company <input name="company" value="{{ r.story.company or '' }}" required></label>
+    <label>Role <input name="role" value="{{ r.story.role or '' }}"></label>
+    <label>Year <input name="year" value="{{ r.story.year or '' }}"></label>
+    <label>Outcome
+      <select name="outcome">
+        {% for o in ['offer', 'rejected', 'no reply', 'unknown'] %}<option {{ 'selected' if r.story.outcome == o }}>{{ o }}</option>{% endfor %}
+      </select>
+    </label>
+  </div>
+
+  <h2>What we found ({{ r.facts|length }})</h2>
+  <table class="facts">
+    <tr><th>Keep</th><th>Type</th><th>Fact</th><th>Your words</th></tr>
+    {% for kind, value, quote in r.facts %}
+    <tr>
+      <td><input type="checkbox" name="keep" value="{{ loop.index0 }}" checked></td>
+      <td>{{ kind }}<input type="hidden" name="kind" value="{{ kind }}"></td>
+      <td>{{ value }}<input type="hidden" name="value" value="{{ value }}"></td>
+      <td class="quote">“{{ quote }}”<input type="hidden" name="quote" value="{{ quote }}"></td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% if r.dropped %}
+  <details><summary>{{ r.dropped|length }} things the model said but we could not find in your text (dropped)</summary>
+    <ul>{% for d in r.dropped %}<li>{{ d.kind }}: {{ d.value }} — “{{ d.quote }}”</li>{% endfor %}</ul>
+  </details>
+  {% endif %}
+
+  <h2>Your choice</h2>
+  <label class="check"><input type="checkbox" name="consent_summary" checked> Use my answers in an anonymous summary</label>
+  <label class="check"><input type="checkbox" name="consent_contact" id="cc"> Juniors may contact me through this tool</label>
+  <div class="grid">
+    <label>Name (only if you allow contact) <input name="name"></label>
+    <label>Contact: email or LinkedIn (only if you allow contact) <input name="contact"></label>
+    <label>Proof link, optional (offer screenshot, GitHub, certificate) <input name="proof_url"></label>
+  </div>
+  <button>Save</button>
+</form>
+{% endblock %}

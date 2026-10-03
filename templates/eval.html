@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>How well does it work?</h1>
+<p class="muted">Hide one person's story, build the plan from everyone else, and check how many of their topics the plan covered. Compare that to a generic plan made from other companies.</p>
+
+{% if s.n %}
+<div class="stats">
+  <div><strong>{{ (s.plan_recall * 100)|round|int }}%</strong><span>topics covered by the company plan</span></div>
+  <div><strong>{{ (s.baseline_recall * 100)|round|int if s.baseline_recall is not none else '–' }}{{ '%' if s.baseline_recall is not none }}</strong><span>covered by a generic plan</span></div>
+  <div><strong>{{ s.n }}</strong><span>stories tested (plan size {{ s.plan_size }})</span></div>
+</div>
+<p class="note">Small numbers. Treat this as a pilot, not proof.</p>
+<table class="facts">
+  <tr><th>Story</th><th>Company</th><th>Topics</th><th>Plan</th><th>Generic</th></tr>
+  {% for r in rows %}
+  <tr><td>#{{ r.story_id }}</td><td>{{ r.company }}</td><td>{{ r.held_topics }}</td>
+      <td>{{ (r.plan_recall * 100)|round|int }}%</td>
+      <td>{{ (r.baseline_recall * 100)|round|int if r.baseline_recall is not none else '–' }}{{ '%' if r.baseline_recall is not none }}</td></tr>
+  {% endfor %}
+</table>
+{% else %}
+<p class="muted">Needs at least 3 stories for one company.</p>
+{% endif %}
+
+{% if r.n %}
+<h2>Finding the right person</h2>
+<p>For {{ r.n }} real questions, the right person was in the top 3 <strong>{{ (r.hit_at_3 * 100)|round|int }}%</strong> of the time.</p>
+{% endif %}
+{% endblock %}

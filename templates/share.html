@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Share how your internship process went</h1>
+<p class="muted">Paste it the way you'd tell a junior on WhatsApp. Hinglish is fine. Failed attempts help just as much. You'll see exactly what was pulled out before anything is saved.</p>
+{% if demo %}<p class="note">This is the public demo: text here goes to Gemma on Google AI Studio and is not saved. Please don't paste anything private. For real stories, run PrepMap locally.</p>{% endif %}
+{% if error %}<p class="error">{{ error }}</p>{% endif %}
+<form method="post">
+  <textarea name="text" rows="12" placeholder="Applied for Google STEP in 2025. OA had 2 questions, one graph and one DP...">{{ text or '' }}</textarea>
+  <button>Read my story</button>
+</form>
+{% endblock %}

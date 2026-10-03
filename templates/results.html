@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block body %}
+<p class="muted">You asked: “{{ q }}”</p>
+<p class="intent">Understood as:
+  {% if intent.company %}<span class="chip">{{ intent.company }}</span>{% endif %}
+  {% if intent.role %}<span class="chip">{{ intent.role }}</span>{% endif %}
+  {% for t in intent.topics %}<span class="chip soft">{{ t }}</span>{% endfor %}
+  {% if intent.deadline %}<span class="chip soft">by {{ intent.deadline }}</span>{% endif %}
+</p>
+
+{% if intent.company %}
+<p><a class="button" href="{{ url_for('company', name=intent.company) }}">Open the {{ intent.company }} playbook →</a></p>
+{% endif %}
+
+<h2>{{ people|length }} {{ 'person' if people|length == 1 else 'people' }} you can ask</h2>
+{% for p in people %}
+<article class="person">
+  <h3>{{ p.story.name }} <span class="muted">· {{ p.story.company }}{% if p.story.role %} · {{ p.story.role }}{% endif %}{% if p.story.year %} · {{ p.story.year }}{% endif %}</span></h3>
+  {% if p.rounds %}<p class="muted">Rounds: {{ p.rounds|join(' → ') }}</p>{% endif %}
+  <ul class="why">
+    {% for ok, text in p.why %}<li class="{{ 'yes' if ok else 'no' }}">{{ '✓' if ok else '✗' }} {{ text }}</li>{% endfor %}
+  </ul>
+  <details>
+    <summary>Draft a message (you send it yourself)</summary>
+    <textarea rows="4">{{ p.message }}</textarea>
+    {% if p.story.contact %}<p class="muted">Contact: {{ p.story.contact }}</p>{% endif %}
+  </details>
+</article>
+{% else %}
+<p class="muted">Nobody who agreed to be contacted matches yet.</p>
+{% endfor %}
+
+{% if hidden %}
+<p class="note">{{ hidden }} more {{ 'person' if hidden == 1 else 'people' }} with relevant experience chose to stay anonymous. Their stories still count in the playbook.</p>
+{% endif %}
+{% endblock %}
