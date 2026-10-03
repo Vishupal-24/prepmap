@@ -1,0 +1,13 @@
+{
+  "round_types": ["OA", "coding", "machine coding", "CS fundamentals", "system design", "project discussion", "manager chat", "HR"],
+  "topics": [
+    "arrays", "strings", "hashing", "two pointers", "sliding window", "binary search",
+    "sorting", "stacks", "queues", "linked lists", "trees", "binary search trees",
+    "heaps", "graphs", "BFS/DFS", "shortest paths", "union find", "tries",
+    "dynamic programming", "greedy", "recursion/backtracking", "bit manipulation",
+    "math/number theory", "intervals", "segment trees",
+    "OOP", "low level design", "system design", "DBMS", "SQL", "operating systems",
+    "computer networks", "concurrency", "API design", "debugging",
+    "resume projects", "behavioral", "machine learning", "probability", "aptitude"
+  ]
+}
