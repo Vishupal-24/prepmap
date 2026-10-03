@@ -5,8 +5,15 @@
   <p class="muted">Ask in plain words. You get seniors who went through it, why they match, and a prep plan built from what they actually said.</p>
   <form method="post" action="{{ url_for('ask') }}" class="ask">
     <input name="q" placeholder="e.g. Google SWE intern OA next week, weak at graphs and DP" required autofocus>
-    <button>Find people</button>
+    <button id="ask-btn">Find people</button>
   </form>
+  <script>
+    document.querySelector(".ask").addEventListener("submit", function () {
+      var btn = document.getElementById("ask-btn");
+      btn.disabled = true;
+      btn.textContent = "Searching...";
+    });
+  </script>
 </section>
 
 <section>
