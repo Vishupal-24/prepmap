@@ -11,7 +11,7 @@ services:
       - key: LLM_PROVIDER
         value: gemini
       - key: GEMINI_MODEL
-        value: gemma-3-27b-it
+        value: gemma-4-26b-a4b-it
       - key: PREPMAP_DB
         value: /tmp/prepmap.db
       - key: PYTHON_VERSION

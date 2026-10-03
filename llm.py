@@ -13,7 +13,9 @@ import requests
 PROVIDER = os.environ.get("LLM_PROVIDER", "ollama")
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
 OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "gemma3:4b")
-GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemma-3-27b-it")
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemma-4-26b-a4b-it")
+# if the newer model is not available on this key, fall back to Gemma 3
+GEMINI_FALLBACK = os.environ.get("GEMINI_FALLBACK", "gemma-3-27b-it")
 TIMEOUT = 180
 
 _mock_reply = None  # tests set this
@@ -62,23 +64,36 @@ def _ollama(prompt):
     return r.json()["response"]
 
 
+_active_model = GEMINI_MODEL
+
+
 def _gemini(prompt):
+    global _active_model
+    r = _gemini_call(_active_model, prompt)
+    if r.status_code in (400, 404) and _active_model != GEMINI_FALLBACK:
+        _active_model = GEMINI_FALLBACK
+        r = _gemini_call(_active_model, prompt)
+    r.raise_for_status()
+    parts = r.json()["candidates"][0]["content"]["parts"]
+    # thinking models can return a thought part first; keep the visible text
+    return "".join(p.get("text", "") for p in parts if not p.get("thought"))
+
+
+def _gemini_call(model, prompt):
     key = os.environ["GEMINI_API_KEY"]
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent"
-    r = requests.post(
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+    return requests.post(
         url,
         headers={"x-goog-api-key": key},
         json={"contents": [{"parts": [{"text": prompt}]}],
               "generationConfig": {"temperature": 0}},
         timeout=TIMEOUT,
     )
-    r.raise_for_status()
-    return r.json()["candidates"][0]["content"]["parts"][0]["text"]
 
 
 def describe():
     if PROVIDER == "gemini":
-        return f"Gemma ({GEMINI_MODEL}) via Google AI Studio - demo mode"
+        return f"Gemma ({_active_model}) via Google AI Studio - demo mode"
     if PROVIDER == "mock":
         return "mock model (tests)"
     return f"Gemma ({OLLAMA_MODEL}) running locally via Ollama"

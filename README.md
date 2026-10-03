@@ -52,7 +52,7 @@ Settings (environment variables):
 |---|---|---|
 | `LLM_PROVIDER` | `ollama` | `ollama`, `gemini` or `mock` |
 | `OLLAMA_MODEL` | `gemma3:4b` | any Gemma tag you pulled |
-| `GEMINI_MODEL` | `gemma-3-27b-it` | Gemma model on AI Studio |
+| `GEMINI_MODEL` | `gemma-4-26b-a4b-it` | Gemma model on AI Studio (falls back to `gemma-3-27b-it`) |
 | `DEMO_MODE` | off | `1` = sample data, no saving |
 
 ## Privacy
