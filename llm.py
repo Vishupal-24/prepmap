@@ -65,14 +65,20 @@ def _ollama(prompt):
 
 
 _active_model = GEMINI_MODEL
+# extraction is copying, not reasoning, so keep thinking short (it was 3000 tokens / 70s)
+_thinking = {"thinkingLevel": "minimal"}
 
 
 def _gemini(prompt):
-    global _active_model
-    r = _gemini_call(_active_model, prompt)
+    global _active_model, _thinking
+    r = _gemini_call(_active_model, prompt, _thinking)
+    if r.status_code == 400 and _thinking:
+        print(f"[gemma] thinking setting rejected: {r.text[:200]}", flush=True)
+        _thinking = None
+        r = _gemini_call(_active_model, prompt, _thinking)
     if r.status_code in (400, 404) and _active_model != GEMINI_FALLBACK:
         _active_model = GEMINI_FALLBACK
-        r = _gemini_call(_active_model, prompt)
+        r = _gemini_call(_active_model, prompt, None)
     r.raise_for_status()
     body = r.json()
     # shows up in the Render logs, handy for spotting slow calls
@@ -82,14 +88,16 @@ def _gemini(prompt):
     return "".join(p.get("text", "") for p in parts if not p.get("thought"))
 
 
-def _gemini_call(model, prompt):
+def _gemini_call(model, prompt, thinking):
     key = os.environ["GEMINI_API_KEY"]
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+    config = {"temperature": 0}
+    if thinking:
+        config["thinkingConfig"] = thinking
     return requests.post(
         url,
         headers={"x-goog-api-key": key},
-        json={"contents": [{"parts": [{"text": prompt}]}],
-              "generationConfig": {"temperature": 0}},
+        json={"contents": [{"parts": [{"text": prompt}]}], "generationConfig": config},
         timeout=TIMEOUT,
     )
 
