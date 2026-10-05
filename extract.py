@@ -130,8 +130,10 @@ def from_form_row(row):
         name = _pick(t, TOPICS)
         if name:
             facts.append(("topic", name, t))
-    for kind, col in [("resource", "resources"), ("mistake", "mistake"),
-                      ("advice", "advice"), ("timeline", "timeline")]:
+    # people list several resources in one answer
+    for r in _split(row.get("resources")):
+        facts.append(("resource", r, r))
+    for kind, col in [("mistake", "mistake"), ("advice", "advice"), ("timeline", "timeline")]:
         val = (row.get(col) or "").strip()
         if val:
             facts.append((kind, val, val))

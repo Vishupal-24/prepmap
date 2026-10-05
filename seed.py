@@ -58,3 +58,8 @@ def load_demo():
                  "contact": "sample only, not a real person" if ok else None,
                  "proof_url": None, "consent_summary": 1, "consent_contact": 1 if ok else 0, "approved": 1}
         db.save_story(story, from_form_row(row))
+    # a couple of sample questions so the board isn't empty in the demo
+    q = db.add_question("For the Google OA, is hard DP worth it or should I focus on graphs?", "Google")
+    db.add_answer(q, "In my sample year both came up. Do medium DP well before touching hard ones.",
+                  "sample answer, not a real person")
+    db.add_question("Does Flipkart machine coding expect working code or just good class design?", "Flipkart")

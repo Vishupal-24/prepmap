@@ -6,13 +6,20 @@ Built for the DEV Hacktoberfest Weekend Challenge: Build for a Friend.
 
 ## What it does
 
-- **Ask in plain words**: "Google SWE intern OA next week, weak at graphs". Gemma turns it into company, role and topics.
-- **People you can ask**: seniors who went through that process, with a clear "why this person" (and why not). Only people who said yes to contact are shown. Everyone else counts anonymously.
-- **Playbook per company or program** (Google, Stripe, Amazon ML Summer School, GSoC...): rounds in the usual order, topics with "3 of 5 stories" counts, resources, mistakes, and what people wish they knew. Every line opens to the exact sentence it came from.
-- **Who to ask at each stage**: for every round (OA, coding, manager chat), the people who went through it and agreed to be contacted.
-- **Same route as you**: stories record how people got in (campus, off-campus, referral, PPO), and matches show when someone took the same route.
-- **Gaps**: what nobody has told us yet, and the question to ask a senior.
-- **Honest numbers**: a leave-one-out test on the `/eval` page compares the company plan with a generic one.
+No login, no signup. Open it and use it.
+
+- **Landing page** that explains the idea, live stats, and how it works.
+- **Find people**: ask in plain words ("Google SWE intern via campus, weak at graphs"). Gemma turns it into company, route and topics, and you get seniors who went through it, with ✓/✗ reasons for every match.
+- **Explore**: every company and program as a card, filterable by route (campus, off-campus, referral, PPO) and outcome.
+- **Playbooks**: rounds in order, topics with "3 of 5 stories" counts, resources, mistakes, what people wish they knew, timeline, and gaps. Every line opens to the exact sentence it came from.
+- **Who to ask at each stage**: for every round, the people who went through it and agreed to be contacted.
+- **Personal prep plan**: pick days left and weak topics, get a day-by-day plan built only from real stories, with a checklist saved in your browser and a print/PDF view.
+- **Compare**: two companies side by side, and the topics you can prepare once for both.
+- **Topic pages**: weak at DP? See which companies ask it most, with quotes.
+- **Story pages**: one person's process as facts (never the raw text).
+- **Anonymous questions board**: ask and answer without an account.
+- **Share your story**: paste it, see what Gemma extracted, fix it, choose consent, get a delete link.
+- **Honest evaluation**: `/eval` runs a leave-one-out test against a generic plan.
 
 ## How it works
 
@@ -71,6 +78,7 @@ db.py           tables and queries
 llm.py          talks to Gemma (Ollama, AI Studio or mock)
 extract.py      story -> grounded facts
 plan.py         playbook, gaps, people matching
+insights.py     explore, topics, compare, prep plans, story pages
 evaluate.py     leave-one-out and retrieval tests
 import_form.py  Google Form CSV import
 seed.py         fake demo data

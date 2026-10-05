@@ -32,6 +32,19 @@ CREATE TABLE IF NOT EXISTS facts (
     position INTEGER DEFAULT 0
 );
 CREATE INDEX IF NOT EXISTS facts_story ON facts(story_id);
+CREATE TABLE IF NOT EXISTS questions (
+    id INTEGER PRIMARY KEY,
+    company TEXT,              -- optional: which company or program it is about
+    text TEXT NOT NULL,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS answers (
+    id INTEGER PRIMARY KEY,
+    question_id INTEGER NOT NULL REFERENCES questions(id) ON DELETE CASCADE,
+    text TEXT NOT NULL,
+    by_line TEXT,              -- optional, e.g. "4th year, got the offer"
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
 """
 
 
@@ -105,3 +118,45 @@ def companies():
         rows = conn.execute(
             "SELECT company, COUNT(*) n FROM stories WHERE approved = 1 GROUP BY lower(company) ORDER BY n DESC")
         return [dict(r) for r in rows]
+
+
+def story(story_id):
+    with connect() as conn:
+        row = conn.execute("SELECT * FROM stories WHERE id = ? AND approved = 1", (story_id,)).fetchone()
+        return dict(row) if row else None
+
+
+# --- anonymous questions board ----------------------------------------------
+
+def add_question(text, company=None):
+    with connect() as conn:
+        return conn.execute("INSERT INTO questions (text, company) VALUES (?, ?)", (text, company)).lastrowid
+
+
+def add_answer(question_id, text, by_line=None):
+    with connect() as conn:
+        conn.execute("INSERT INTO answers (question_id, text, by_line) VALUES (?, ?, ?)",
+                     (question_id, text, by_line))
+
+
+def questions(company=None):
+    sql = """SELECT q.*, COUNT(a.id) AS answers FROM questions q
+             LEFT JOIN answers a ON a.question_id = q.id"""
+    args = []
+    if company:
+        sql += " WHERE lower(q.company) = lower(?)"
+        args.append(company)
+    sql += " GROUP BY q.id ORDER BY answers = 0 DESC, q.id DESC"
+    with connect() as conn:
+        return [dict(r) for r in conn.execute(sql, args)]
+
+
+def question(question_id):
+    with connect() as conn:
+        q = conn.execute("SELECT * FROM questions WHERE id = ?", (question_id,)).fetchone()
+        if not q:
+            return None
+        q = dict(q)
+        q["answers"] = [dict(r) for r in conn.execute(
+            "SELECT * FROM answers WHERE question_id = ? ORDER BY id", (question_id,))]
+        return q
