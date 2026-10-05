@@ -11,18 +11,22 @@ with open(os.path.join(os.path.dirname(__file__), "data", "taxonomy.json")) as f
 ROUND_TYPES = TAXONOMY["round_types"]
 TOPICS = TAXONOMY["topics"]
 OUTCOMES = ["offer", "rejected", "no reply", "unknown"]
+ROUTES = ["campus", "off-campus", "referral", "PPO", "unknown"]
 
 PROMPT = """You read interview experiences written by students and pull out facts.
+The experience can be about a company internship or a program (like Amazon ML Summer School, GSoC or Google STEP).
 Rules:
 - Only use what the text says. Do not guess.
 - For every item copy a short exact quote from the text that supports it.
 - round "type" must be one of: {rounds}
 - topic "name" must be one of: {topics}
 - outcome must be one of: {outcomes}
+- route is how they got in, one of: {routes}
+- "advice" means what they wish they had known earlier, or tips for juniors
 - Use null when the text does not say.
 
 Return only JSON in this shape:
-{{"company": str|null, "role": str|null, "year": int|null, "outcome": str,
+{{"company": str|null, "role": str|null, "year": int|null, "outcome": str, "route": str,
   "rounds": [{{"type": str, "quote": str}}],
   "topics": [{{"name": str, "quote": str}}],
   "resources": [{{"name": str, "quote": str}}],
@@ -55,7 +59,7 @@ def _pick(value, allowed):
 def extract(text):
     raw = llm.generate_json(PROMPT.format(
         rounds=", ".join(ROUND_TYPES), topics=", ".join(TOPICS),
-        outcomes=", ".join(OUTCOMES), text=text))
+        outcomes=", ".join(OUTCOMES), routes=", ".join(ROUTES), text=text))
     return validate(raw, text)
 
 
@@ -97,8 +101,22 @@ def validate(raw, text):
         "role": (raw.get("role") or "").strip() or None,
         "year": year if isinstance(year, int) else None,
         "outcome": _pick(raw.get("outcome") or "unknown", OUTCOMES) or "unknown",
+        "route": pick_route(raw.get("route")),
     }
     return {"story": story, "facts": unique, "dropped": dropped}
+
+
+def pick_route(value):
+    v = _norm(value)
+    if "ppo" in v or "pre-placement" in v:
+        return "PPO"
+    if "refer" in v:
+        return "referral"
+    if re.search(r"\boff[- ]?campus\b", v):
+        return "off-campus"
+    if re.search(r"\b(on[- ]?)?campus\b", v):
+        return "campus"
+    return "unknown"
 
 
 def from_form_row(row):

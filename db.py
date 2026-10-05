@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS stories (
     role TEXT,
     year INTEGER,
     outcome TEXT,              -- offer / rejected / no reply / unknown
+    route TEXT,                -- campus / off-campus / referral / PPO / unknown
     source TEXT,               -- form / paste
     raw_text TEXT,
     name TEXT,                 -- only kept if consent_contact = 1
@@ -45,6 +46,10 @@ def init():
     os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
     with connect() as conn:
         conn.executescript(SCHEMA)
+        # older databases were made before the route column existed
+        cols = {r["name"] for r in conn.execute("PRAGMA table_info(stories)")}
+        if "route" not in cols:
+            conn.execute("ALTER TABLE stories ADD COLUMN route TEXT")
 
 
 def save_story(story, facts):
@@ -54,7 +59,7 @@ def save_story(story, facts):
         story["name"] = None
         story["contact"] = None
     story["delete_token"] = secrets.token_urlsafe(8)
-    cols = ["company", "role", "year", "outcome", "source", "raw_text", "name", "contact",
+    cols = ["company", "role", "year", "outcome", "route", "source", "raw_text", "name", "contact",
             "proof_url", "consent_summary", "consent_contact", "approved", "delete_token"]
     with connect() as conn:
         cur = conn.execute(

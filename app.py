@@ -72,13 +72,14 @@ def save():
              if str(i) in keep]
     company = f.get("company", "").strip()
     if not company:
-        return "Company is required", 400
+        return "Company or program is required", 400
     year = f.get("year", "").strip()
     story = {
         "company": company,
         "role": f.get("role", "").strip() or None,
         "year": int(year) if year.isdigit() else None,
         "outcome": f.get("outcome") or "unknown",
+        "route": f.get("route") or "unknown",
         "source": "paste",
         "raw_text": f.get("text"),
         "name": f.get("name", "").strip() or None,

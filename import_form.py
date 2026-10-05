@@ -8,7 +8,7 @@ import csv
 import sys
 
 import db
-from extract import from_form_row
+from extract import from_form_row, pick_route
 
 # form column header -> our field
 COLUMNS = {
@@ -16,12 +16,13 @@ COLUMNS = {
     "Role": "role",
     "Year": "year",
     "Outcome": "outcome",
+    "How you got in": "route",
     "Rounds": "rounds",
     "Topics": "topics",
     "Days between rounds": "timeline",
     "Resources": "resources",
     "Mistake": "mistake",
-    "Advice": "advice",
+    "What I wish I knew": "advice",
     "Proof link": "proof_url",
     "Summary consent": "consent_summary",
     "Contact consent": "consent_contact",
@@ -59,6 +60,7 @@ def main(path):
                 "role": row["role"] or None,
                 "year": int(row["year"]) if row["year"].isdigit() else None,
                 "outcome": outcome(row["outcome"]),
+                "route": pick_route(row["route"]),
                 "source": "form",
                 "raw_text": None,
                 "name": row["name"] or None,

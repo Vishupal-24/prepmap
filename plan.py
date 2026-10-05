@@ -5,7 +5,7 @@ from collections import defaultdict
 
 import db
 import llm
-from extract import ROUND_TYPES, TOPICS, _norm, _pick
+from extract import ROUND_TYPES, TOPICS, _norm, _pick, pick_route
 
 
 def confidence(n):
@@ -57,7 +57,35 @@ def playbook(company):
         "advice": ranked("advice"),
         "timeline": ranked("timeline"),
         "gaps": gaps(len(sts), grouped, outcomes),
+        "stages": stage_map(rounds),
+        "routes": _count(s["route"] or "unknown" for s in sts),
     }
+
+
+def _count(values):
+    out = defaultdict(int)
+    for v in values:
+        out[v] += 1
+    return dict(sorted(out.items(), key=lambda x: -x[1]))
+
+
+def stage_map(rounds):
+    """For each round, who went through it and can be asked. Anonymous people only count."""
+    stages = []
+    for r in rounds:
+        people, anonymous, seen = [], 0, set()
+        for story, quote in r["refs"]:
+            if story["id"] in seen:
+                continue
+            seen.add(story["id"])
+            if story["consent_contact"] and story["name"]:
+                people.append({"story": story, "quote": quote})
+            else:
+                anonymous += 1
+        # offers and recent years first: they remember the round best
+        people.sort(key=lambda p: (p["story"]["outcome"] != "offer", -(p["story"]["year"] or 0)))
+        stages.append({"round": r["value"], "people": people[:3], "anonymous": anonymous})
+    return stages
 
 
 # things a junior always wants to know, and the question to ask if nobody said it
@@ -85,8 +113,9 @@ def gaps(n, grouped, outcomes):
 
 # --- finding people -----------------------------------------------------------
 
-INTENT_PROMPT = """A student asks for help preparing for an internship. Read the question and return only JSON:
-{{"company": str|null, "role": str|null, "topics": [str], "deadline": str|null}}
+INTENT_PROMPT = """A student asks for help preparing for an internship or a program. Read the question and return only JSON:
+{{"company": str|null, "role": str|null, "topics": [str], "deadline": str|null, "route": str|null}}
+company can also be a program name (like Amazon ML Summer School). route is how they plan to apply: campus, off-campus, referral or PPO, else null.
 topics must come from: {topics}
 Question: \"\"\"{q}\"\"\"
 """
@@ -94,7 +123,7 @@ Question: \"\"\"{q}\"\"\"
 
 def parse_intent(question, known_companies):
     """Try the model, fall back to simple matching so search never breaks."""
-    intent = {"company": None, "role": None, "topics": [], "deadline": None}
+    intent = {"company": None, "role": None, "topics": [], "deadline": None, "route": None}
     try:
         raw = llm.generate_json(INTENT_PROMPT.format(topics=", ".join(TOPICS), q=question))
         intent.update({k: raw.get(k) for k in intent if raw.get(k)})
@@ -106,6 +135,8 @@ def parse_intent(question, known_companies):
         for c in known_companies:
             if _norm(c) in q:
                 intent["company"] = c
+    route = pick_route(intent["route"] or question)
+    intent["route"] = route if route != "unknown" else None
     if not intent["topics"]:
         intent["topics"] = [t for t in TOPICS if re.search(r"\b" + re.escape(_norm(t)) + r"\b", q)]
     return intent
@@ -142,6 +173,14 @@ def match_people(intent, limit=5):
         elif s["outcome"] == "rejected":
             score += 1
             why.append((True, "Was rejected, can tell you what went wrong"))
+        if intent.get("route") and s["route"] and s["route"] != "unknown":
+            if s["route"] == intent["route"]:
+                score += 2
+                why.append((True, f"Same route as you ({s['route']})"))
+            else:
+                why.append((False, f"Different route ({s['route']})"))
+        elif s["route"] and s["route"] != "unknown":
+            why.append((True, f"Got in via {s['route']}"))
         if want_role and s["role"] and want_role in _norm(s["role"]):
             score += 1
             why.append((True, f"Same role: {s['role']}"))
