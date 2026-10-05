@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 {% block body %}
 <section class="hero">
-  <h1>Who has already cracked this internship?</h1>
+  <h1>Who has already cracked this internship or program?</h1>
   <p class="muted">Ask in plain words. You get seniors who went through it, why they match, and a prep plan built from what they actually said.</p>
   <form method="post" action="{{ url_for('ask') }}" class="ask">
-    <input name="q" placeholder="e.g. Google SWE intern OA next week, weak at graphs and DP" required autofocus>
+    <input name="q" placeholder="e.g. Google SWE intern via campus, OA next week, weak at graphs" required autofocus>
     <button id="ask-btn">Find people</button>
   </form>
   <script>

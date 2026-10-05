@@ -5,11 +5,12 @@
   {% if intent.company %}<span class="chip">{{ intent.company }}</span>{% endif %}
   {% if intent.role %}<span class="chip">{{ intent.role }}</span>{% endif %}
   {% for t in intent.topics %}<span class="chip soft">{{ t }}</span>{% endfor %}
+  {% if intent.route %}<span class="chip soft">via {{ intent.route }}</span>{% endif %}
   {% if intent.deadline %}<span class="chip soft">by {{ intent.deadline }}</span>{% endif %}
 </p>
 
 {% if intent.company %}
-<p><a class="button" href="{{ url_for('company', name=intent.company) }}">Open the {{ intent.company }} playbook →</a></p>
+<p><a class="button" href="{{ url_for('company', name=intent.company) }}">Open the {{ intent.company }} playbook and who to ask at each stage →</a></p>
 {% endif %}
 
 <h2>{{ people|length }} {{ 'person' if people|length == 1 else 'people' }} you can ask</h2>

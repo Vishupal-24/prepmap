@@ -5,12 +5,17 @@
 <form method="post" action="{{ url_for('save') }}">
   <input type="hidden" name="text" value="{{ text }}">
   <div class="grid">
-    <label>Company <input name="company" value="{{ r.story.company or '' }}" required></label>
+    <label>Company or program <input name="company" value="{{ r.story.company or '' }}" required></label>
     <label>Role <input name="role" value="{{ r.story.role or '' }}"></label>
     <label>Year <input name="year" value="{{ r.story.year or '' }}"></label>
     <label>Outcome
       <select name="outcome">
         {% for o in ['offer', 'rejected', 'no reply', 'unknown'] %}<option {{ 'selected' if r.story.outcome == o }}>{{ o }}</option>{% endfor %}
+      </select>
+    </label>
+    <label>How you got in
+      <select name="route">
+        {% for o in ['campus', 'off-campus', 'referral', 'PPO', 'unknown'] %}<option {{ 'selected' if r.story.route == o }}>{{ o }}</option>{% endfor %}
       </select>
     </label>
   </div>

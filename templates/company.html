@@ -9,7 +9,24 @@
 <h1>{{ pb.company }} playbook</h1>
 <p class="muted">Built from {{ pb.n }} {{ 'story' if pb.n == 1 else 'stories' }}
   <span class="badge {{ pb.confidence }}">{{ pb.confidence }} confidence</span>
-  · outcomes: {% for k, v in pb.outcomes.items() %}{{ v }} {{ k }}{{ ', ' if not loop.last }}{% endfor %}</p>
+  · outcomes: {% for k, v in pb.outcomes.items() %}{{ v }} {{ k }}{{ ', ' if not loop.last }}{% endfor %}
+  · got in via: {% for k, v in pb.routes.items() %}{{ v }} {{ k }}{{ ', ' if not loop.last }}{% endfor %}</p>
+
+<section>
+  <h2>Who to ask at each stage</h2>
+  <p class="muted">Different people remember different rounds best. Ask the right person for the round you're on.</p>
+  <ol class="stages">
+  {% for st in pb.stages %}
+    <li><strong>{{ st.round }}</strong>
+      {% if st.people %}
+      <ul>{% for p in st.people %}<li>{{ p.story.name }} <span class="muted">· {{ p.story.outcome }}{% if p.story.year %} · {{ p.story.year }}{% endif %}{% if p.story.route and p.story.route != 'unknown' %} · {{ p.story.route }}{% endif %}</span><br><span class="muted">“{{ p.quote }}”</span></li>{% endfor %}</ul>
+      {% endif %}
+      {% if st.anonymous %}<p class="muted">+ {{ st.anonymous }} anonymous {{ 'story' if st.anonymous == 1 else 'stories' }} about this round</p>{% endif %}
+      {% if not st.people and not st.anonymous %}<p class="muted">Nobody yet</p>{% endif %}
+    </li>
+  {% endfor %}
+  </ol>
+</section>
 
 <section>
   <h2>Rounds, in the usual order</h2>
@@ -28,7 +45,7 @@
 <div class="grid">
   <section><h2>Resources that helped</h2><ul>{% for r in pb.resources %}<li>{{ r.value }} {{ refs(r) }}</li>{% else %}<li class="muted">None shared yet</li>{% endfor %}</ul></section>
   <section><h2>Mistakes to avoid</h2><ul>{% for r in pb.mistakes %}<li>{{ r.value }} {{ refs(r) }}</li>{% else %}<li class="muted">None shared yet</li>{% endfor %}</ul></section>
-  <section><h2>Advice</h2><ul>{% for r in pb.advice %}<li>{{ r.value }} {{ refs(r) }}</li>{% else %}<li class="muted">None shared yet</li>{% endfor %}</ul></section>
+  <section><h2>What I wish I knew</h2><ul>{% for r in pb.advice %}<li>{{ r.value }} {{ refs(r) }}</li>{% else %}<li class="muted">None shared yet</li>{% endfor %}</ul></section>
   <section><h2>Timeline</h2><ul>{% for r in pb.timeline %}<li>{{ r.value }} {{ refs(r) }}</li>{% else %}<li class="muted">None shared yet</li>{% endfor %}</ul></section>
 </div>
 
