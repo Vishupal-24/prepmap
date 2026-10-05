@@ -69,3 +69,6 @@ label.check input { width: auto; }
 .stats span { color: var(--muted); font-size: .9rem; }
 details textarea { margin-top: 8px; }
 @media (max-width: 520px) { .bars li { grid-template-columns: 1fr; } }
+.stages > li { margin: 10px 0; }
+.stages ul { list-style: none; padding-left: 0; margin: 4px 0; font-size: .92rem; }
+.stages ul li { margin: 4px 0; }
