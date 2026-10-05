@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Ask seniors · PrepMap{% endblock %}
+{% block body %}
+<h1>Ask seniors, anonymously</h1>
+<p class="muted">No account, no name. Ask what you'd hesitate to ask in a group chat. Anyone who has been through it can answer, also without revealing who they are.</p>
+{% if demo %}<p class="note">Public demo: questions here are public and reset when the demo restarts. Don't post anything private.</p>{% endif %}
+{% if error %}<p class="error">{{ error }}</p>{% endif %}
+
+<form method="post" class="qform">
+  <textarea name="text" rows="3" placeholder="e.g. For the Google OA, is it worth doing hard DP or should I focus on graphs?" required></textarea>
+  <div class="row">
+    <label>About (optional)
+      <select name="company">
+        <option value="">anything</option>
+        {% for c in companies %}<option>{{ c.company }}</option>{% endfor %}
+      </select>
+    </label>
+    <button>Post question</button>
+  </div>
+</form>
+
+<h2>{{ 'Questions about ' + company if company else 'Recent questions' }}</h2>
+{% if company %}<p class="muted"><a href="{{ url_for('questions') }}">Show all questions</a></p>{% endif %}
+<ul class="qlist">
+  {% for q in qs %}
+  <li>
+    <a href="{{ url_for('question', question_id=q.id) }}">{{ q.text[:160] }}{{ '…' if q.text|length > 160 }}</a>
+    <span class="muted">{% if q.company %}{{ q.company }} · {% endif %}{{ q.answers }} answer{{ '' if q.answers == 1 else 's' }}{% if not q.answers %} · <strong>needs an answer</strong>{% endif %}</span>
+  </li>
+  {% else %}
+  <li class="muted">No questions yet. Be the first.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

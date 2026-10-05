@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Explore · PrepMap{% endblock %}
+{% block body %}
+<h1>Explore companies and programs</h1>
+<p class="muted">Every card is built from stories people shared. Filter by how they got in or how it ended.</p>
+
+<form method="get" class="filters">
+  <label>Route
+    <select name="route" onchange="this.form.submit()">
+      <option value="">any</option>
+      {% for r in ['campus', 'off-campus', 'referral', 'PPO'] %}<option {{ 'selected' if route == r }}>{{ r }}</option>{% endfor %}
+    </select>
+  </label>
+  <label>Outcome
+    <select name="outcome" onchange="this.form.submit()">
+      <option value="">any</option>
+      {% for o in ['offer', 'rejected', 'no reply'] %}<option {{ 'selected' if outcome == o }}>{{ o }}</option>{% endfor %}
+    </select>
+  </label>
+  <noscript><button>Filter</button></noscript>
+</form>
+
+<div class="explore">
+{% for c in cards %}
+  <article class="card">
+    <h3><a href="{{ url_for('company', name=c.company) }}">{{ c.company }}</a></h3>
+    <p class="muted">{{ c.n }} {{ 'story' if c.n == 1 else 'stories' }}{% if c.latest %} · latest {{ c.latest }}{% endif %}</p>
+    <p>{{ c.offers }} offer{{ '' if c.offers == 1 else 's' }}, {{ c.rejected }} rejected · {{ c.contactable }} open to questions</p>
+    {% if c.top_topics %}<p>{% for t in c.top_topics %}<a class="chip soft" href="{{ url_for('topic', name=t) }}">{{ t }}</a>{% endfor %}</p>{% endif %}
+    <p class="card-actions">
+      <a href="{{ url_for('company', name=c.company) }}">Playbook</a> ·
+      <a href="{{ url_for('prep_plan', name=c.company) }}">Make a prep plan</a>
+    </p>
+  </article>
+{% else %}
+  <p class="muted">Nothing matches these filters yet.</p>
+{% endfor %}
+</div>
+{% endblock %}

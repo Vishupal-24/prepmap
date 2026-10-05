@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}Not found · PrepMap{% endblock %}
+{% block body %}
+<h1>We don't have that one yet</h1>
+<p class="muted">Nobody has shared a story about this yet, or the link is wrong.</p>
+<p><a class="button" href="{{ url_for('explore') }}">Explore what we have</a> &nbsp; <a href="{{ url_for('share') }}">Share a story</a></p>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Topics · PrepMap{% endblock %}
+{% block body %}
+<h1>Search by topic</h1>
+<p class="muted">Weak at something? Pick it and see which companies ask it most, with what people actually said.</p>
+{% if topics %}
+<p class="topic-cloud">
+  {% for t, n in topics %}<a class="chip soft" href="{{ url_for('topic', name=t) }}">{{ t }} · {{ n }}</a>{% endfor %}
+</p>
+{% else %}
+<p class="muted">No topics yet. They appear once stories are shared.</p>
+{% endif %}
+{% endblock %}

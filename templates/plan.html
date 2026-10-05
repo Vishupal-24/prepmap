@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% set pb = p.pb %}
+{% block title %}{{ p.days }}-day plan · {{ pb.company }} · PrepMap{% endblock %}
+{% block body %}
+<p class="muted no-print"><a href="{{ url_for('prep_plan', name=pb.company) }}">← Change dates or weak topics</a></p>
+<h1>Your {{ p.days }}-day {{ pb.company }} plan</h1>
+<p class="muted">From {{ pb.n }} {{ 'story' if pb.n == 1 else 'stories' }} <span class="badge {{ pb.confidence }}">{{ pb.confidence }} confidence</span>. Tick things off as you go; your ticks stay in this browser.</p>
+<p class="no-print"><button type="button" onclick="window.print()">Print or save as PDF</button></p>
+
+<ol class="plan" id="plan">
+  {% for b in p.schedule %}
+  <li>
+    <label class="check">
+      <input type="checkbox" data-key="{{ pb.company }}|{{ b.topic }}">
+      <span><strong>{{ b.from|day }}{% if b.to != b.from %} → {{ b.to|day }}{% endif %}</strong> · {{ b.topic }}
+      {% if b.weak %}<span class="chip soft">your weak spot</span>{% endif %}
+      <span class="muted">· came up in {{ b.count }} of {{ pb.n }} stories</span></span>
+    </label>
+  </li>
+  {% endfor %}
+  {% for f in p.final %}
+  <li>
+    <label class="check">
+      <input type="checkbox" data-key="{{ pb.company }}|final{{ loop.index }}">
+      <span><strong>{{ f.date|day }}</strong> · {{ f.task }}</span>
+    </label>
+  </li>
+  {% endfor %}
+</ol>
+
+{% if p.not_covered %}
+<p class="note">Nobody has reported {{ p.not_covered|join(', ') }} for {{ pb.company }} yet, so it isn't in the plan. Worth <a href="{{ url_for('questions', company=pb.company) }}">asking a senior</a>.</p>
+{% endif %}
+
+<div class="grid">
+  <section>
+    <h2>Resources people used</h2>
+    <ul>{% for r in p.resources %}<li>{{ r.value }} <span class="muted">({{ r.count }})</span></li>{% else %}<li class="muted">None shared yet</li>{% endfor %}</ul>
+  </section>
+  <section>
+    <h2>Mistakes to avoid</h2>
+    <ul>{% for r in p.mistakes %}<li>{{ r.value }}</li>{% else %}<li class="muted">None shared yet</li>{% endfor %}</ul>
+  </section>
+</div>
+
+<script>
+  // remember ticks in this browser only; no account needed
+  document.querySelectorAll("#plan input[type=checkbox]").forEach(function (box) {
+    var key = "prepmap:" + box.dataset.key;
+    try { box.checked = localStorage.getItem(key) === "1"; } catch (e) {}
+    box.addEventListener("change", function () {
+      try { localStorage.setItem(key, box.checked ? "1" : "0"); } catch (e) {}
+    });
+  });
+</script>
+{% endblock %}

@@ -10,13 +10,16 @@
 </p>
 
 {% if intent.company %}
-<p><a class="button" href="{{ url_for('company', name=intent.company) }}">Open the {{ intent.company }} playbook and who to ask at each stage →</a></p>
+<p class="actions">
+  <a class="button" href="{{ url_for('company', name=intent.company) }}">Open the {{ intent.company }} playbook →</a>
+  <a class="button ghost" href="{{ url_for('prep_plan', name=intent.company) }}">Make my prep plan</a>
+</p>
 {% endif %}
 
 <h2>{{ people|length }} {{ 'person' if people|length == 1 else 'people' }} you can ask</h2>
 {% for p in people %}
 <article class="person">
-  <h3>{{ p.story.name }} <span class="muted">· {{ p.story.company }}{% if p.story.role %} · {{ p.story.role }}{% endif %}{% if p.story.year %} · {{ p.story.year }}{% endif %}</span></h3>
+  <h3><a href="{{ url_for('story', story_id=p.story.id) }}">{{ p.story.name }}</a> <span class="muted">· {{ p.story.company }}{% if p.story.role %} · {{ p.story.role }}{% endif %}{% if p.story.year %} · {{ p.story.year }}{% endif %}</span></h3>
   {% if p.rounds %}<p class="muted">Rounds: {{ p.rounds|join(' → ') }}</p>{% endif %}
   <ul class="why">
     {% for ok, text in p.why %}<li class="{{ 'yes' if ok else 'no' }}">{{ '✓' if ok else '✗' }} {{ text }}</li>{% endfor %}

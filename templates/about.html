@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}About & privacy · PrepMap{% endblock %}
+{% block body %}
+<h1>About PrepMap</h1>
+<p>Every time an internship opens, juniors ask seniors the same questions: how was the OA, what did they ask, what should I study. The answers are valuable, but they live in WhatsApp chats and get lost. PrepMap keeps them, counts them and points you to the right person.</p>
+
+<h2>How the AI is used</h2>
+<p>An open-weight model, Gemma, reads each story and pulls out facts: rounds, topics, resources, mistakes and advice. For every fact it must copy a short quote from the story. Plain code then checks that the quote really appears in the text. If it doesn't, the fact is dropped. The model reads; normal code counts, ranks and decides.</p>
+
+<h2>Privacy</h2>
+<ul>
+  <li><strong>No accounts.</strong> Nothing to sign up for, nothing to track you with.</li>
+  <li><strong>Names only with a yes.</strong> A name or contact is stored only if the person ticks "juniors may contact me". Everyone else counts anonymously.</li>
+  <li><strong>The original text stays hidden.</strong> Story pages show extracted facts, never the full text someone pasted.</li>
+  <li><strong>Delete any time.</strong> Every saved story gets a delete link.</li>
+  <li><strong>Runs on your laptop.</strong> For real stories, PrepMap runs with local Gemma through Ollama, so nothing leaves the machine. The hosted demo uses made-up sample stories only.</li>
+  <li><strong>Checklists stay in your browser.</strong> Your prep plan ticks are saved only on your device.</li>
+</ul>
+
+<h2>What it isn't</h2>
+<p>It doesn't predict whether you'll get selected, and it doesn't rank people. It shows what people reported, how many said it, and how sure we can be.</p>
+
+<h2>Open source</h2>
+<p>The code is on <a href="https://github.com/Vishupal-24/prepmap">GitHub</a> under the MIT license. Built for the DEV Hacktoberfest 2026 Weekend Challenge: Build for a Friend.</p>
+{% endblock %}

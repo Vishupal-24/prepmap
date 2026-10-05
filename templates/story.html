@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% set s = v.story %}
+{% block title %}{{ s.company }} story · PrepMap{% endblock %}
+{% block body %}
+<p class="muted"><a href="{{ url_for('company', name=s.company) }}">← {{ s.company }} playbook</a></p>
+<h1>{{ s.company }}{% if s.role %} · {{ s.role }}{% endif %}</h1>
+<p>
+  <span class="chip {{ 'soft' if s.outcome != 'offer' }}">{{ s.outcome }}</span>
+  {% if s.route and s.route != 'unknown' %}<span class="chip soft">via {{ s.route }}</span>{% endif %}
+  {% if s.year %}<span class="chip soft">{{ s.year }}</span>{% endif %}
+  <span class="chip soft">{{ 'evidence attached' if s.proof_url else 'self-reported' }}</span>
+</p>
+<p class="muted">Shared by {{ s.name if s.consent_contact and s.name else 'someone who chose to stay anonymous' }}. Only the extracted facts are shown here, never the original text.</p>
+
+{% if v.rounds %}
+<h2>Rounds</h2>
+<ol class="rounds">{% for f in v.facts['round'] %}<li><strong>{{ f.value }}</strong> <span class="muted">“{{ f.quote }}”</span></li>{% endfor %}</ol>
+{% endif %}
+
+{% for kind, title in [('topic', 'Topics they faced'), ('resource', 'Resources that helped'), ('mistake', 'Mistakes'), ('advice', 'What they wish they knew'), ('timeline', 'Timeline')] %}
+  {% if v.facts[kind] %}
+  <h2>{{ title }}</h2>
+  <ul>{% for f in v.facts[kind] %}<li>{% if kind == 'topic' %}<a href="{{ url_for('topic', name=f.value) }}">{{ f.value }}</a>{% else %}{{ f.value }}{% endif %}{% if f.quote != f.value %} <span class="muted">“{{ f.quote }}”</span>{% endif %}</li>{% endfor %}</ul>
+  {% endif %}
+{% endfor %}
+
+{% if s.consent_contact and s.contact %}
+<p class="note">This person is open to questions: {{ s.contact }}</p>
+{% endif %}
+{% endblock %}

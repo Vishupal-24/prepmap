@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Find people · PrepMap{% endblock %}
+{% block body %}
+<h1>Who has already been through this?</h1>
+<p class="muted">Describe what you're preparing for in plain words. Mention the company or program, how you're applying (campus, off-campus, referral) and what you're weak at.</p>
+<form method="post" action="{{ url_for('ask') }}" class="ask">
+  <input name="q" placeholder="e.g. Flipkart SDE intern, machine coding round scares me" required autofocus>
+  <button id="ask-btn">Find people</button>
+</form>
+<script>
+  document.querySelector(".ask").addEventListener("submit", function () {
+    var btn = document.getElementById("ask-btn");
+    btn.disabled = true;
+    btn.textContent = "Searching...";
+  });
+</script>
+
+<h2>Try one of these</h2>
+<ul class="examples">
+  <li>Google SWE intern via campus, OA next week, weak at graphs</li>
+  <li>Stripe intern, worried about the manager chat</li>
+  <li>Amazon ML Summer School test, how much probability?</li>
+</ul>
+<script>
+  // clicking an example fills the box
+  document.querySelectorAll(".examples li").forEach(function (li) {
+    li.addEventListener("click", function () {
+      document.querySelector(".ask input").value = li.textContent;
+    });
+  });
+</script>
+
+{% if companies %}
+<h2>Or open a playbook</h2>
+<ul class="cards">
+  {% for c in companies %}
+  <li><a href="{{ url_for('company', name=c.company) }}"><strong>{{ c.company }}</strong><span>{{ c.n }} {{ 'story' if c.n == 1 else 'stories' }}</span></a></li>
+  {% endfor %}
+</ul>
+{% endif %}
+{% endblock %}

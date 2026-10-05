@@ -1,12 +1,15 @@
 {% extends "base.html" %}
+{% block title %}PrepMap · learn from seniors who already did it{% endblock %}
 {% block body %}
-<section class="hero">
-  <h1>Who has already cracked this internship or program?</h1>
-  <p class="muted">Ask in plain words. You get seniors who went through it, why they match, and a prep plan built from what they actually said.</p>
+<section class="landing-hero">
+  <p class="eyebrow">For students preparing for internships and programs</p>
+  <h1>Stop guessing how to prepare. Learn from the seniors who already cracked it.</h1>
+  <p class="lead">Every placement season, the same questions get asked in WhatsApp groups and the answers disappear. PrepMap keeps them. Seniors share how their process went, open AI turns each story into facts, and you get a playbook, a prep plan and the right person to ask.</p>
   <form method="post" action="{{ url_for('ask') }}" class="ask">
-    <input name="q" placeholder="e.g. Google SWE intern via campus, OA next week, weak at graphs" required autofocus>
+    <input name="q" placeholder="e.g. Google SWE intern via campus, OA next week, weak at graphs" required>
     <button id="ask-btn">Find people</button>
   </form>
+  <p class="muted small">Or <a href="{{ url_for('explore') }}">browse every company and program</a> · <a href="{{ url_for('share') }}">share your own story</a></p>
   <script>
     document.querySelector(".ask").addEventListener("submit", function () {
       var btn = document.getElementById("ask-btn");
@@ -16,16 +19,53 @@
   </script>
 </section>
 
+<section class="stats">
+  <div><strong>{{ s.stories }}</strong><span>stories shared</span></div>
+  <div><strong>{{ s.companies }}</strong><span>companies &amp; programs</span></div>
+  <div><strong>{{ s.offers }} / {{ s.rejections }}</strong><span>offers / rejections (both count)</span></div>
+  <div><strong>{{ s.facts }}</strong><span>facts, each tied to a quote</span></div>
+</section>
+
 <section>
-  <h2>Playbooks</h2>
-  {% if companies %}
+  <h2>How it works</h2>
+  <ol class="steps">
+    <li><strong>A senior shares their story.</strong> Pasted the way they'd tell a junior on WhatsApp. Hinglish is fine.</li>
+    <li><strong>Gemma pulls out the facts.</strong> Rounds, topics, resources, mistakes and what they wish they knew, each with the exact sentence it came from. If a quote isn't really in the text, the fact is dropped.</li>
+    <li><strong>The senior checks it.</strong> Nothing is saved until they approve it, and they choose whether juniors may contact them.</li>
+    <li><strong>You get a playbook.</strong> What people actually faced, counted across stories, plus who to ask at each stage and a day-by-day plan.</li>
+  </ol>
+</section>
+
+<section>
+  <h2>What you can do</h2>
+  <div class="features">
+    <a href="{{ url_for('ask') }}"><strong>Find the right senior</strong><span>Ask in plain words. See who went through the same process, with ✓ and ✗ reasons for every match.</span></a>
+    <a href="{{ url_for('explore') }}"><strong>Read a playbook</strong><span>Rounds in order, topics with "3 of 5 stories" counts, resources, mistakes and gaps.</span></a>
+    <a href="{{ url_for('explore') }}"><strong>Get a prep plan</strong><span>Pick your test date and weak topics. Get a day-by-day plan built only from real stories, with a checklist.</span></a>
+    <a href="{{ url_for('questions') }}"><strong>Ask anonymously</strong><span>Post a question without an account. Seniors can answer without revealing who they are.</span></a>
+    <a href="{{ url_for('compare') }}"><strong>Compare two companies</strong><span>See which topics overlap, so one round of prep covers both.</span></a>
+    <a href="{{ url_for('topics') }}"><strong>Search by topic</strong><span>Weak at DP? See which companies ask it most and what people said.</span></a>
+  </div>
+</section>
+
+{% if companies %}
+<section>
+  <h2>Popular playbooks</h2>
   <ul class="cards">
     {% for c in companies %}
     <li><a href="{{ url_for('company', name=c.company) }}"><strong>{{ c.company }}</strong><span>{{ c.n }} {{ 'story' if c.n == 1 else 'stories' }}</span></a></li>
     {% endfor %}
   </ul>
-  {% else %}
-  <p class="muted">No stories yet. <a href="{{ url_for('share') }}">Add the first one.</a></p>
-  {% endif %}
+</section>
+{% endif %}
+
+<section class="trust">
+  <h2>Why you can trust it</h2>
+  <ul>
+    <li><strong>Every line has a source.</strong> Click any count to see the sentences behind it.</li>
+    <li><strong>Failures count too.</strong> Hearing only from people who got in teaches half the story.</li>
+    <li><strong>Private by design.</strong> No accounts. Names and contacts appear only if the person said yes. Every story has a delete link. Real stories run on a laptop with local Gemma.</li>
+    <li><strong>Honest numbers.</strong> The <a href="{{ url_for('eval_page') }}">evaluation page</a> tests whether a company's playbook beats a generic plan.</li>
+  </ul>
 </section>
 {% endblock %}

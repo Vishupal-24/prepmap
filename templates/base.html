@@ -4,20 +4,32 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}PrepMap{% endblock %}</title>
+  <meta name="description" content="Find seniors who already cracked the internship you want, and a prep plan built from what they actually said.">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
   <header class="top">
-    <a class="brand" href="{{ url_for('home') }}">PrepMap</a>
+    <a class="brand" href="{{ url_for('home') }}">Prep<span>Map</span></a>
     <nav>
-      <a href="{{ url_for('share') }}">Share your story</a>
-      <a href="{{ url_for('eval_page') }}">How well it works</a>
+      <a href="{{ url_for('explore') }}">Explore</a>
+      <a href="{{ url_for('ask') }}">Find people</a>
+      <a href="{{ url_for('questions') }}">Ask seniors</a>
+      <a href="{{ url_for('compare') }}">Compare</a>
+      <a class="nav-cta" href="{{ url_for('share') }}">Share your story</a>
     </nav>
   </header>
   {% if demo %}
-  <div class="banner">Public demo with sample data. Real stories stay on a local machine with local Gemma.</div>
+  <div class="banner">Public demo with made-up sample stories. Real stories stay on a local machine with local Gemma.</div>
   {% endif %}
   <main>{% block body %}{% endblock %}</main>
-  <footer>Model: {{ model }} · Every claim links back to the sentence it came from.</footer>
+  <footer>
+    <p>
+      <a href="{{ url_for('about') }}">About &amp; privacy</a> ·
+      <a href="{{ url_for('topics') }}">All topics</a> ·
+      <a href="{{ url_for('eval_page') }}">How well it works</a> ·
+      <a href="https://github.com/Vishupal-24/prepmap">Source code</a>
+    </p>
+    <p>Model: {{ model }} · Every claim links back to the sentence it came from.</p>
+  </footer>
 </body>
 </html>

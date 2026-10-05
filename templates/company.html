@@ -2,7 +2,7 @@
 {% block title %}{{ pb.company }} · PrepMap{% endblock %}
 {% macro refs(item) %}
 <details class="refs"><summary>{{ item.count }} of {{ pb.n }} stories</summary>
-  <ul>{% for s, quote in item.refs %}<li>“{{ quote }}” <span class="muted">— {{ s.name if s.consent_contact and s.name else 'anonymous' }}{% if s.year %}, {{ s.year }}{% endif %}</span></li>{% endfor %}</ul>
+  <ul>{% for s, quote in item.refs %}<li>“{{ quote }}” <span class="muted">— <a href="{{ url_for('story', story_id=s.id) }}">{{ s.name if s.consent_contact and s.name else 'anonymous' }}{% if s.year %}, {{ s.year }}{% endif %}</a></span></li>{% endfor %}</ul>
 </details>
 {% endmacro %}
 {% block body %}
@@ -12,6 +12,13 @@
   · outcomes: {% for k, v in pb.outcomes.items() %}{{ v }} {{ k }}{{ ', ' if not loop.last }}{% endfor %}
   · got in via: {% for k, v in pb.routes.items() %}{{ v }} {{ k }}{{ ', ' if not loop.last }}{% endfor %}</p>
 
+<p class="actions no-print">
+  <a class="button" href="{{ url_for('prep_plan', name=pb.company) }}">Make my prep plan</a>
+  <a class="button ghost" href="{{ url_for('questions', company=pb.company) }}">Ask a question about {{ pb.company }}</a>
+  <a class="button ghost" href="{{ url_for('compare', a=pb.company) }}">Compare with another</a>
+  <button type="button" class="ghost" onclick="window.print()">Print / save PDF</button>
+</p>
+
 <section>
   <h2>Who to ask at each stage</h2>
   <p class="muted">Different people remember different rounds best. Ask the right person for the round you're on.</p>
@@ -19,7 +26,7 @@
   {% for st in pb.stages %}
     <li><strong>{{ st.round }}</strong>
       {% if st.people %}
-      <ul>{% for p in st.people %}<li>{{ p.story.name }} <span class="muted">· {{ p.story.outcome }}{% if p.story.year %} · {{ p.story.year }}{% endif %}{% if p.story.route and p.story.route != 'unknown' %} · {{ p.story.route }}{% endif %}</span><br><span class="muted">“{{ p.quote }}”</span></li>{% endfor %}</ul>
+      <ul>{% for p in st.people %}<li>{{ p.story.name }} <span class="muted">· {{ p.story.outcome }}{% if p.story.year %} · {{ p.story.year }}{% endif %}{% if p.story.route and p.story.route != 'unknown' %} · {{ p.story.route }}{% endif %}</span>{% if p.quote|lower != st.round|lower %}<br><span class="muted">“{{ p.quote }}”</span>{% endif %}</li>{% endfor %}</ul>
       {% endif %}
       {% if st.anonymous %}<p class="muted">+ {{ st.anonymous }} anonymous {{ 'story' if st.anonymous == 1 else 'stories' }} about this round</p>{% endif %}
       {% if not st.people and not st.anonymous %}<p class="muted">Nobody yet</p>{% endif %}
@@ -37,7 +44,7 @@
   <h2>Topics that came up</h2>
   <ul class="bars">
   {% for t in pb.topics %}
-    <li><span class="label">{{ t.value }}</span><span class="bar" style="--w: {{ (t.count / pb.n * 100)|round }}%"></span>{{ refs(t) }}</li>
+    <li><span class="label"><a href="{{ url_for('topic', name=t.value) }}">{{ t.value }}</a></span><span class="bar" style="--w: {{ (t.count / pb.n * 100)|round }}%"></span>{{ refs(t) }}</li>
   {% endfor %}
   </ul>
 </section>
@@ -49,11 +56,19 @@
   <section><h2>Timeline</h2><ul>{% for r in pb.timeline %}<li>{{ r.value }} {{ refs(r) }}</li>{% else %}<li class="muted">None shared yet</li>{% endfor %}</ul></section>
 </div>
 
+{% if questions %}
+<section>
+  <h2>Questions juniors asked</h2>
+  <ul class="qlist">{% for q in questions %}<li><a href="{{ url_for('question', question_id=q.id) }}">{{ q.text[:140] }}</a> <span class="muted">{{ q.answers }} answer{{ '' if q.answers == 1 else 's' }}</span></li>{% endfor %}</ul>
+</section>
+{% endif %}
+
 {% if pb.gaps %}
 <section class="gaps">
   <h2>What nobody has told us yet</h2>
   <p class="muted">Ask a senior these. They are the holes in this playbook.</p>
   <ul>{% for g in pb.gaps %}<li><strong>{{ g.missing }}</strong>: {{ g.question }}</li>{% endfor %}</ul>
+  <p class="no-print"><a href="{{ url_for('questions', company=pb.company) }}">Post one of these on the questions board →</a></p>
 </section>
 {% endif %}
 {% endblock %}

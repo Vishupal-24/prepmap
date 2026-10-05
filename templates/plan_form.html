@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Prep plan · {{ pb.company }} · PrepMap{% endblock %}
+{% block body %}
+<p class="muted"><a href="{{ url_for('company', name=pb.company) }}">← {{ pb.company }} playbook</a></p>
+<h1>Make my {{ pb.company }} prep plan</h1>
+<p class="muted">Built only from what {{ pb.n }} {{ 'person' if pb.n == 1 else 'people' }} reported. Topics that came up more get more days, and your weak topics get extra time.</p>
+<form method="get" action="{{ url_for('prep_plan', name=pb.company) }}">
+  <label>Days until your test or interview
+    <input type="number" name="days" min="1" max="90" value="14" required>
+  </label>
+  {% if pb.topics %}
+  <h2>Which of these are you weak at?</h2>
+  <div class="checks">
+    {% for t in pb.topics %}
+    <label class="check"><input type="checkbox" name="weak" value="{{ t.value }}"> {{ t.value }} <span class="muted">({{ t.count }} of {{ pb.n }})</span></label>
+    {% endfor %}
+  </div>
+  {% endif %}
+  <button>Make my plan</button>
+</form>
+{% endblock %}

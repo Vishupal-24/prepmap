@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Compare · PrepMap{% endblock %}
+{% block body %}
+<h1>Compare two companies or programs</h1>
+<p class="muted">Applying to more than one? See which topics overlap, so one round of prep covers both.</p>
+<form method="get" class="filters">
+  <label>First
+    <select name="a">{% for n in names %}<option {{ 'selected' if a == n }}>{{ n }}</option>{% endfor %}</select>
+  </label>
+  <label>Second
+    <select name="b">{% for n in names %}<option {{ 'selected' if b == n or (not b and loop.index == 2) }}>{{ n }}</option>{% endfor %}</select>
+  </label>
+  <button>Compare</button>
+</form>
+
+{% if r %}
+{% if r.common %}
+<p class="note"><strong>Prepare these once, use them for both:</strong> {{ r.common|join(', ') }}</p>
+{% else %}
+<p class="note">No topic overlap reported yet. These need separate prep.</p>
+{% endif %}
+
+<table class="facts compare">
+  <tr><th>Topic</th><th><a href="{{ url_for('company', name=r.a.company) }}">{{ r.a.company }}</a> <span class="muted">({{ r.a.n }})</span></th><th><a href="{{ url_for('company', name=r.b.company) }}">{{ r.b.company }}</a> <span class="muted">({{ r.b.n }})</span></th></tr>
+  {% for row in r.rows %}
+  <tr>
+    <td><a href="{{ url_for('topic', name=row.topic) }}">{{ row.topic }}</a></td>
+    <td><span class="mini-bar" style="--w: {{ (row.a * 100)|round }}%"></span> {{ (row.a * 100)|round|int }}%</td>
+    <td><span class="mini-bar" style="--w: {{ (row.b * 100)|round }}%"></span> {{ (row.b * 100)|round|int }}%</td>
+  </tr>
+  {% endfor %}
+</table>
+
+<div class="grid">
+  <section><h2>{{ r.a.company }} rounds</h2><ol>{% for x in r.a.rounds %}<li>{{ x.value }}</li>{% endfor %}</ol></section>
+  <section><h2>{{ r.b.company }} rounds</h2><ol>{% for x in r.b.rounds %}<li>{{ x.value }}</li>{% endfor %}</ol></section>
+</div>
+{% elif a and a == b %}
+<p class="muted">Pick two different ones.</p>
+{% endif %}
+{% endblock %}

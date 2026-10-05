@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}{{ name }} · PrepMap{% endblock %}
+{% block body %}
+<p class="muted"><a href="{{ url_for('topics') }}">← All topics</a></p>
+<h1>Where does “{{ name }}” come up?</h1>
+<p class="muted">Share of each company's stories that mention this topic. Higher means it's more worth your time for that company.</p>
+{% if rows %}
+<ul class="bars">
+  {% for r in rows %}
+  <li>
+    <span class="label"><a href="{{ url_for('company', name=r.company) }}">{{ r.company }}</a></span>
+    <span class="bar" style="--w: {{ (r.count / r.total * 100)|round }}%"></span>
+    <details class="refs"><summary>{{ r.count }} of {{ r.total }} stories</summary>
+      <ul>{% for q in r.quotes %}<li>“{{ q }}”</li>{% endfor %}</ul>
+    </details>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p class="muted">Nobody has mentioned this topic yet.</p>
+{% endif %}
+{% endblock %}

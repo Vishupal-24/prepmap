@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Question · PrepMap{% endblock %}
+{% block body %}
+<p class="muted"><a href="{{ url_for('questions') }}">← All questions</a></p>
+<h1 class="question-text">{{ q.text }}</h1>
+{% if q.company %}<p><a class="chip soft" href="{{ url_for('company', name=q.company) }}">{{ q.company }}</a></p>{% endif %}
+
+<h2>{{ q.answers|length }} answer{{ '' if q.answers|length == 1 else 's' }}</h2>
+{% for a in q.answers %}
+<article class="answer">
+  <p>{{ a.text }}</p>
+  <p class="muted small">— {{ a.by_line or 'anonymous' }}</p>
+</article>
+{% else %}
+<p class="muted">No answers yet.</p>
+{% endfor %}
+
+<h2>Been through this? Answer it</h2>
+<form method="post" class="qform">
+  <textarea name="text" rows="4" required placeholder="What actually happened for you, and what you'd tell a junior."></textarea>
+  <div class="row">
+    <label>Describe yourself, optional (no names needed)
+      <input name="by_line" maxlength="80" placeholder="e.g. 4th year, got the offer in 2025">
+    </label>
+    <button>Post answer</button>
+  </div>
+</form>
+{% endblock %}
